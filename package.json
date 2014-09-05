@@ -1,0 +1,39 @@
+{
+  "name": "jquery-dynamicNumber",
+  "title": "jQuery dynamicNumber",
+  "description": "A jQuery plugin that animate the progress bar",
+  "version": "0.1.0",
+  "homepage": "https://github.com/amazingSurge/jquery-dynamicNumber",
+  "author": {
+    "name": "amazingSurge",
+    "email": "amazingSurge@yahoo.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:amazingSurge/jquery-dynamicNumber.git"
+  },
+  "bugs": {
+    "url": "https://github.com/amazingSurge/jquery-dynamicNumber/issues"
+  },
+  "licenses": [
+    {
+      "type": "GPL",
+      "url": "https://github.com/amazingSurge/jquery-dynamicNumber/blob/master/LICENSE-GPL"
+    }
+  ],
+  "devDependencies": {
+    "grunt": "*",
+    "grunt-contrib-concat": "*",
+    "grunt-contrib-clean": "*",
+    "grunt-contrib-watch": "*",
+    "grunt-contrib-copy": "*",
+    "load-grunt-tasks": "*",
+    "grunt-jsbeautifier": "*",
+    "grunt-text-replace": "*",
+    "grunt-contrib-jshint": "*",
+    "grunt-contrib-uglify": "*"
+  },
+  "dependencies": {
+    "grunt-jquery-builder": "*"
+  }
+}

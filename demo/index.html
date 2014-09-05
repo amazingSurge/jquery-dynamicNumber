@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>            <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>                 <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>                 <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title></title>
+<meta name="description" content="">
+<meta name="viewport" content="width=device-width">
+<link rel="stylesheet" href="css/prelude.css">
+<link rel="stylesheet" href="css/rainbow.css">
+<style type="text/css">
+    body {
+        padding: 40px;
+    }
+    .dynamicNumber {
+        display: block;
+    }
+</style>
+</head>
+<body>
+    <section>
+        <h2>dynamicNumber</h2>
+        <section>
+            <div class="row">
+                <span class="dynamicNumber" data-from="0" data-step="1" data-to="30">0</span>
+                <span class="dynamicNumber" data-from="0" data-step="0.5" data-to="30" data-decimals="2">0</span>
+                <span class="dynamicNumber" data-from="0" data-step="1" data-to="30" data-currency='{"indicator": "$"}' data-format="currency">$0</span>
+                <span class="dynamicNumber" data-from="0.00" data-step="100.00" data-to="10000.00" data-decimals="0" data-format="group">0</span>
+                <span class="dynamicNumber" data-from="0" data-step="1" data-to="30" data-format="percentage">0%</span>
+                <span class="dynamicNumber" data-from="0" data-step="1" data-to="30" data-format="percentage_callback">0%</span>
+                <div>
+                    <button id="button_start">start()</button>
+                    <button id="button_finish">finish()</button>
+                    <button id="button_go">go('50')</button>
+                    <button id="button_go_100">go('100')</button>
+                    <button id="button_stop">stop()</button>
+                    <button id="button_reset">reset()</button>
+                </div>
+            </div>
+        </section>
+    </section>
+
+    <script type="text/javascript" src="js/rainbow.min.js"></script>
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="../src/jquery-dynamicNumber.js"></script>
+    <script type="text/javascript">
+    function percentage_callback(n){
+        return n + '%';
+    }
+
+    jQuery(document).ready(function($){
+        $('.dynamicNumber').dynamicNumber({
+            onUpdate: function(n){
+                if(n > 75){
+                    this.$element.css('color', 'red');
+                } else if(n < 40) {
+                    this.$element.css('color', 'green')
+                } else {
+                    this.$element.css('color', 'orange');
+                }
+            }
+        });
+        $('#button_start').on('click', function(){
+            $('.dynamicNumber').dynamicNumber('start');
+        });
+        $('#button_finish').on('click', function(){
+             $('.dynamicNumber').dynamicNumber('finish');
+        });
+        $('#button_go').on('click', function(){
+             $('.dynamicNumber').dynamicNumber('go',50);
+        });
+        $('#button_go_100').on('click', function(){
+             $('.dynamicNumber').dynamicNumber('go',100);
+        });
+        $('#button_stop').on('click', function(){
+            $('.dynamicNumber').dynamicNumber('stop');
+        });
+        $('#button_reset').on('click', function(){
+            $('.dynamicNumber').dynamicNumber('reset');
+        });
+    });
+    </script>
+</body>
+</html>
