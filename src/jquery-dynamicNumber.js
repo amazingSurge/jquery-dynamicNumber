@@ -8,6 +8,37 @@
 (function($, document, window, undefined) {
     "use strict";
 
+    if (!Date.now){
+        Date.now = function() { return new Date().getTime(); };
+    }
+
+    var vendors = ['webkit', 'moz'];
+    for (var i = 0; i < vendors.length && !window.requestAnimationFrame; ++i) {
+        var vp = vendors[i];
+        window.requestAnimationFrame = window[vp+'RequestAnimationFrame'];
+        window.cancelAnimationFrame = (window[vp+'CancelAnimationFrame']
+                                   || window[vp+'CancelRequestAnimationFrame']);
+    }
+    if (/iP(ad|hone|od).*OS 6/.test(window.navigator.userAgent) // iOS6 is buggy
+        || !window.requestAnimationFrame || !window.cancelAnimationFrame) {
+        var lastTime = 0;
+        window.requestAnimationFrame = function(callback) {
+            var now = Date.now();
+            var nextTime = Math.max(lastTime + 16, now);
+            return setTimeout(function() { callback(lastTime = nextTime); },
+                              nextTime - now);
+        };
+        window.cancelAnimationFrame = clearTimeout;
+    }
+
+    function getTime(){
+        if (window.performance.now) {
+            return window.performance.now();
+        } else {
+            return Date.now();
+        }
+    }
+
     var pluginName = 'dynamicNumber';
 
     var Plugin = $[pluginName] = function(element, options) {
@@ -24,7 +55,7 @@
         this.now = this.first;
         this.to = parseFloat(this.options.to, 10);
 
-        this._interval = null;
+        this._requestId = null;
         this.initialized = false;
         this._trigger('init');
         this.init();
@@ -33,8 +64,7 @@
     Plugin.defaults = {
         from: 0,
         to: 100,
-        step: 1,
-        speed: 20,
+        duration: 1000,
         decimals: 0,
         format: function(n, options) {
             return n.toFixed(options.decimals);
@@ -124,42 +154,45 @@
                 to = parseFloat(to, 10);
             }
 
-            self._interval = setInterval(function() {
-                var distance = to - self.now,
-                    next;
-                if (distance > 0) {
-                    if (distance < self.options.step) {
+            var start = self.now;
+            var startTime = getTime();
+
+            var animation = function(time){
+                var distance = (time - startTime)/self.options.duration;
+                var next = Math.abs(distance * (start - to));
+
+                if(to > start){
+                    next = start + next;
+                    if(next > to){
                         next = to;
-                    } else {
-                        next = self.now + self.options.step;
                     }
-                } else if (distance < 0) {
-                    if (-distance < self.options.step) {
+                } else{
+                    next = start - next;
+                    if(next < to){
                         next = to;
-                    } else {
-                        next = self.now - self.options.step;
                     }
-                } else {
-                    next = to;
                 }
 
                 self._update(next);
-
-                if (self.now === to) {
-                    clearInterval(self._interval);
-                    self._interval = null;
+                if (next === to) {
+                    window.cancelAnimationFrame(self._requestId);
+                    self._requestId = null;
 
                     if (self.now === self.to) {
                         self._trigger('finish');
                     }
+                } else {
+                    self._requestId =  window.requestAnimationFrame(animation);
                 }
-            }, self.options.speed);
+            };
+
+            self._requestId =  window.requestAnimationFrame(animation);
         },
         _update: function(n) {
             this.now = n;
 
             this.$element.attr('aria-valuenow', this.now);
-
+            
             var formated = n;
 
             if(!isNaN(n)){ 
@@ -187,9 +220,9 @@
             this.go(this.to);
         },
         _clear: function() {
-            if (this._interval) {
-                clearInterval(this._interval);
-                this._interval = null;
+            if (this._requestId) {
+                window.cancelAnimationFrame(this._requestId);
+                this._requestId = null;
             }
         },
         reset: function() {

@@ -1,5 +1,5 @@
 # jQuery dynamicNumber
-A jQuery plugin that animate the number dynamicly.
+A jQuery plugin that animate the number dynamically.
 
 ## Usage
 
@@ -9,7 +9,7 @@ Import this libraries:
 
 Create base html element:
 ```html
-    <span class="dynamicNumber" data-from="0" data-step="1" data-to="30">0</span>
+    <span class="dynamicNumber" data-from="0" data-to="100" data-decimals="2" data-format="currency">$0</span>
 ```
 
 Initialize progress:
@@ -23,11 +23,27 @@ $(".dynamicNumber").dynamicNumber();
 {
     from: 0,
     to: 100,
-    step: 1,
-    speed: 20,
-    format: function(n) {
-        return n;
+    duration: 1000,
+    decimals: 0,
+    format: function(n, options) {
+        return n.toFixed(options.decimals);
     },
+    percentage: {
+        decimals: 0
+    },
+    currency: {
+        indicator: '$',
+        size: 3,
+        decimals: '2',
+        separator: ',',
+        decimalsPoint: '.'
+    },
+    group: {
+        size: 3,
+        decimals: '2',
+        separator: ',',
+        decimalsPoint: '.' 
+    }
     onStart: function(){},
     onStop: function(){},
     onUpdate: function(){},

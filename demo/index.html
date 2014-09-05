@@ -25,12 +25,12 @@
         <h2>dynamicNumber</h2>
         <section>
             <div class="row">
-                <span class="dynamicNumber" data-from="0" data-step="1" data-to="30">0</span>
-                <span class="dynamicNumber" data-from="0" data-step="0.5" data-to="30" data-decimals="2">0</span>
-                <span class="dynamicNumber" data-from="0" data-step="1" data-to="30" data-currency='{"indicator": "$"}' data-format="currency">$0</span>
-                <span class="dynamicNumber" data-from="0.00" data-step="100.00" data-to="10000.00" data-decimals="0" data-format="group">0</span>
-                <span class="dynamicNumber" data-from="0" data-step="1" data-to="30" data-format="percentage">0%</span>
-                <span class="dynamicNumber" data-from="0" data-step="1" data-to="30" data-format="percentage_callback">0%</span>
+                <span class="dynamicNumber" data-from="0" data-to="30">0</span>
+                <span class="dynamicNumber" data-from="0" data-to="30" data-decimals="2">0</span>
+                <span class="dynamicNumber" data-from="0" data-to="30" data-currency='{"indicator": "$"}' data-format="currency">$0</span>
+                <span class="dynamicNumber" data-from="0.00" data-to="10000.00" data-decimals="0" data-format="group">0</span>
+                <span class="dynamicNumber" data-from="0" data-to="30" data-format="percentage">0%</span>
+                <span class="dynamicNumber" data-from="0" data-to="30" data-format="custom_callback">%0</span>
                 <div>
                     <button id="button_start">start()</button>
                     <button id="button_finish">finish()</button>
@@ -47,8 +47,8 @@
     <script type="text/javascript" src="js/jquery.min.js"></script>
     <script type="text/javascript" src="../src/jquery-dynamicNumber.js"></script>
     <script type="text/javascript">
-    function percentage_callback(n){
-        return n + '%';
+    function custom_callback(n, options){
+        return '%' + n.toFixed(options.decimals);
     }
 
     jQuery(document).ready(function($){
