@@ -1,270 +1,280 @@
-/*
- * jquery-dynamicNumber
- * https://github.com/amazingSurge/jquery-dynamicNumber
- *
- * Copyright (c) 2014 amazingSurge
- * Licensed under the GPL license.
- */
-(function($, document, window, undefined) {
-    "use strict";
+import $ from "jQuery";
 
-    if (!Date.now){
-        Date.now = function() { return new Date().getTime(); };
-    }
+if (!Date.now) {
+	Date.now = () => new Date().getTime();
+}
 
-    var vendors = ['webkit', 'moz'];
-    for (var i = 0; i < vendors.length && !window.requestAnimationFrame; ++i) {
-        var vp = vendors[i];
-        window.requestAnimationFrame = window[vp+'RequestAnimationFrame'];
-        window.cancelAnimationFrame = (window[vp+'CancelAnimationFrame']
-                                   || window[vp+'CancelRequestAnimationFrame']);
-    }
-    if (/iP(ad|hone|od).*OS 6/.test(window.navigator.userAgent) // iOS6 is buggy
-        || !window.requestAnimationFrame || !window.cancelAnimationFrame) {
-        var lastTime = 0;
-        window.requestAnimationFrame = function(callback) {
-            var now = Date.now();
-            var nextTime = Math.max(lastTime + 16, now);
-            return setTimeout(function() { callback(lastTime = nextTime); },
-                              nextTime - now);
-        };
-        window.cancelAnimationFrame = clearTimeout;
-    }
+let vendors = ['webkit', 'moz'];
 
-    function getTime(){
-        if (window.performance.now) {
-            return window.performance.now();
-        } else {
-            return Date.now();
-        }
-    }
+for (let i = 0; i < vendors.length && !window.requestAnimationFrame; ++i) {
+	let vp = vendors[i];
+	window.requestAnimationFrame = window[vp + 'RequestAnimationFrame'];
+	window.cancelAnimationFrame = (window[vp + 'CancelAnimationFrame'] || window[vp + 'CancelRequestAnimationFrame']);
+}
 
-    var pluginName = 'dynamicNumber';
+if (/iP(ad|hone|od).*OS 6/.test(window.navigator.userAgent) // iOS6 is buggy
+	|| !window.requestAnimationFrame || !window.cancelAnimationFrame) {
+	let lastTime = 0;
+	window.requestAnimationFrame = callback => {
+		var now = Date.now();
+		var nextTime = Math.max(lastTime + 16, now);
+		return setTimeout(() => {
+				callback(lastTime = nextTime);
+			},
+			nextTime - now);
+	};
+	window.cancelAnimationFrame = clearTimeout;
+}
 
-    var Plugin = $[pluginName] = function(element, options) {
-        this.element = element;
-        this.$element = $(element);
+let getTime = () => {
+	if (window.performance.now) {
+		return window.performance.now();
+	} else {
+		return Date.now();
+	}
+}
 
-        this.options = $.extend(true, {}, Plugin.defaults, options, this.$element.data());
-        this.options.step = parseFloat(this.options.step, 10);
+const NAME = 'dynamicNumber';
 
-        this.first = this.$element.attr('aria-valuenow');
-        this.first = this.first? this.first: this.options.from;
-        this.first = parseFloat(this.first, 10);
+const DEFAULT = {
+	namespace: NAME,
+	from: 0,
+	to: 100,
+	duration: 1000,
+	decimals: 0,
+	format: function (n, options) {
+		return n.toFixed(options.decimals);
+	},
+	percentage: {
+		decimals: 0
+	},
+	currency: {
+		indicator: '$',
+		size: 3,
+		decimals: '2',
+		separator: ',',
+		decimalsPoint: '.'
+	},
+	group: {
+		size: 3,
+		decimals: '2',
+		separator: ',',
+		decimalsPoint: '.'
+	}
+};
 
-        this.now = this.first;
-        this.to = parseFloat(this.options.to, 10);
+const formaters = {
+	percentage(n, options) {
+			return n.toFixed(options.decimals) + '%';
+		},
+		currency(n, options) {
+			return options.indicator + formaters.group(n, options);
+		},
+		group(n, options) {
+			let s = '',
+				decimals = options.decimals;
+			if (decimals) {
+				let k = Math.pow(10, decimals);
+				s = '' + Math.round(n * k) / k;
+			} else {
+				s = '' + Math.round(n);
+			}
+			s = s.split('.');
 
-        this._requestId = null;
-        this.initialized = false;
-        this._trigger('init');
-        this.init();
-    };
+			if (s[0].length > 3) {
+				let reg = new RegExp('\\B(?=(?:\\d{' + options.size + '})+(?!\\d))', 'g');
+				s[0] = s[0].replace(reg, options.separator);
+			}
+			if ((s[1] || '').length < decimals) {
+				s[1] = s[1] || '';
+				s[1] += new Array(decimals - s[1].length + 1).join('0');
+			}
+			return s.join(options.decimalsPoint);
+		}
+}
 
-    Plugin.defaults = {
-        from: 0,
-        to: 100,
-        duration: 1000,
-        decimals: 0,
-        format: function(n, options) {
-            return n.toFixed(options.decimals);
-        },
-        percentage: {
-            decimals: 0
-        },
-        currency: {
-            indicator: '$',
-            size: 3,
-            decimals: '2',
-            separator: ',',
-            decimalsPoint: '.'
-        },
-        group: {
-            size: 3,
-            decimals: '2',
-            separator: ',',
-            decimalsPoint: '.' 
-        }
-    };
+class dynamicNumber {
+	constructor(element, options) {
+		this.element = element;
+		this.$element = $(element);
 
-    Plugin.formaters = {
-        percentage: function(n, options){
-            return n.toFixed(options.decimals) + '%';
-        },
-        currency: function(n, options){
-            return options.indicator + Plugin.formaters.group(n, options);
-        },
-        group: function(n, options){
-            var s = '', decimals = options.decimals;
-            if(decimals){
-                var k = Math.pow(10, decimals);
-                s = '' + Math.round(n * k)/k;
-            } else {
-                s = '' + Math.round(n);
-            }
-            s = s.split('.');
+		this.options = $.extend(true, {}, DEFAULT, options, this.$element.data());
+		this.options.step = parseFloat(this.options.step, 10);
 
-            if(s[0].length > 3){
-                var reg = new RegExp('\\B(?=(?:\\d{'+options.size+'})+(?!\\d))', 'g');
-                s[0] = s[0].replace(reg, options.separator);
-            }
-            if((s[1] || '').length < decimals) {
-                s[1] = s[1] || '';
-                s[1] += new Array(decimals - s[1].length + 1).join('0');
-            }
-            return s.join(options.decimalsPoint);
-        }
-    };
+		this.first = this.$element.attr('aria-valuenow');
+		this.first = this.first ? this.first : this.options.from;
+		this.first = parseFloat(this.first, 10);
 
-    Plugin.prototype = {
-        constructor: Plugin,
-        init: function() {
-            this.initialized = true;
-            this._trigger('ready');
-        },
-        _trigger: function(eventType) {
-            var method_arguments = Array.prototype.slice.call(arguments, 1),
-                data = [this].concat(method_arguments);
+		this.now = this.first;
+		this.to = parseFloat(this.options.to, 10);
 
-            // event
-            this.$element.trigger(pluginName + '::' + eventType, data);
+		this._requestId = null;
+		this.initialized = false;
+		this._trigger('init');
+		this.init();
+	}
 
-            // callback
-            eventType = eventType.replace(/\b\w+\b/g, function(word) {
-                return word.substring(0, 1).toUpperCase() + word.substring(1);
-            });
-            var onFunction = 'on' + eventType;
-            if (typeof this.options[onFunction] === 'function') {
-                this.options[onFunction].apply(this, method_arguments);
-            }
-        },
-        go: function(to) {
-            var self = this;
-            this._clear();
+	init() {
+		this.initialized = true;
+		this._trigger('ready');
+	}
 
-            if (typeof to === 'undefined') {
-                to = this.to;
-            } else {
-                to = parseFloat(to, 10);
-            }
+	_trigger(eventType, ...params) {
+		let data = [this].concat(params);
+		//event
+		this.$element.trigger(NAME + '::' + eventType, data);
 
-            var start = self.now;
-            var startTime = getTime();
+		//callback
+		eventType = eventType.replace(/\b\w+\b/g, function (word) {
+			return word.substring(0, 1).toUpperCase() + word.substring(1);
+		});
+		let onFunction = 'on' + eventType;
+		if (typeof this.options[onFunction] === 'function') {
+			this.options[onFunction].apply(this,params);
+		}
+	}
 
-            var animation = function(time){
-                var distance = (time - startTime)/self.options.duration;
-                var next = Math.abs(distance * (start - to));
+	go(to) {
+		this._clear();
 
-                if(to > start){
-                    next = start + next;
-                    if(next > to){
-                        next = to;
-                    }
-                } else{
-                    next = start - next;
-                    if(next < to){
-                        next = to;
-                    }
-                }
+		if (typeof to === 'undefined') {
+			to = this.to;
+		} else {
+			to = parseFloat(to, 10);
+		}
 
-                self._update(next);
-                if (next === to) {
-                    window.cancelAnimationFrame(self._requestId);
-                    self._requestId = null;
+		let start = this.now;
+		var startTime = getTime();
 
-                    if (self.now === self.to) {
-                        self._trigger('finish');
-                    }
-                } else {
-                    self._requestId =  window.requestAnimationFrame(animation);
-                }
-            };
+		let animation = (time) => {
+			let distance = (time - startTime) / this.options.duration;
+			let next = Math.abs(distance * (start - to));
 
-            self._requestId =  window.requestAnimationFrame(animation);
-        },
-        _update: function(n) {
-            this.now = n;
+			if (to > start) {
+				next = start + next;
+				if (next > to) {
+					next = to;
+				}
+			} else {
+				next = start - next;
+				if (next < to) {
+					next = to;
+				}
+			}
 
-            this.$element.attr('aria-valuenow', this.now);
-            
-            var formated = n;
+			this._update(next);
 
-            if(!isNaN(n)){ 
-                if (typeof this.options.format === 'function') {
-                    formated = this.options.format.apply(this, [n, this.options]);
-                } else if(typeof this.options.format === 'string'){
-                    if(typeof Plugin.formaters[this.options.format] !== 'undefined'){
-                        formated = Plugin.formaters[this.options.format].apply(this, [n, this.options[this.options.format]]);
-                    } else if(typeof window[this.options.format] === 'function') {
-                        formated = window[this.options.format].apply(this, [n, this.options]);
-                    }
-                }
-            }
+			if (next === to) {
+				window.cancelAnimationFrame(this._requestId);
+				this._requestId = null;
+				if (this.now === this.to) {
+					this._trigger('finish');
+				}
+			} else {
+				this._requestId = window.requestAnimationFrame(animation);
+			}
+		}
 
-            this.$element.html(formated);
+		this._requestId = window.requestAnimationFrame(animation);
+	}
 
-            this._trigger('update', n);
-        },
-        get: function() {
-            return this.now;
-        },
-        start: function() {
-            this._clear();
-            this._trigger('start');
-            this.go(this.to);
-        },
-        _clear: function() {
-            if (this._requestId) {
-                window.cancelAnimationFrame(this._requestId);
-                this._requestId = null;
-            }
-        },
-        reset: function() {
-            this._clear();
-            this._update(this.first);
-            this._trigger('reset');
-        },
-        stop: function() {
-            this._clear();
-            this._trigger('stop');
-        },
-        finish: function() {
-            this._clear();
-            this._update(this.to);
-            this._trigger('finish');
-        },
-        destory: function() {
-            this.$element.data(pluginName, null);
-            this._trigger('destory');
-        }
-    };
+	_update(n) {
+		this.now = n;
 
-    $.fn[pluginName] = function(options) {
-        if (typeof options === 'string') {
-            var method = options;
-            var method_arguments = Array.prototype.slice.call(arguments, 1);
+		this.$element.attr('aria-valuenow', this.now);
+		let formated = n;
 
-            if (/^\_/.test(method)) {
-                return false;
-            } else if ((/^(get)$/.test(method))) {
-                var api = this.first().data(pluginName);
-                if (api && typeof api[method] === 'function') {
-                    return api[method].apply(api, method_arguments);
-                }
-            } else {
-                return this.each(function() {
-                    var api = $.data(this, pluginName);
-                    if (api && typeof api[method] === 'function') {
-                        api[method].apply(api, method_arguments);
-                    }
-                });
-            }
-        } else {
-            return this.each(function() {
-                if (!$.data(this, pluginName)) {
-                    $.data(this, pluginName, new Plugin(this, options));
-                }
-            });
-        }
-    };
-})(jQuery, document, window);
+		if (!isNaN(n)) {
+			if (typeof this.options.format === 'function') {
+				formated = this.options.format.apply(this, [n, this.options]);
+			} else if (typeof this.options.format === 'string') {
+				if (typeof formaters[this.options.format] !== 'undefined') {
+					formated = formaters[this.options.format].apply(this, [n, this.options[this.options.format]]);
+				} else if (typeof window[this.options.format] === 'function') {
+					formated = window[this.options.format].apply(this, [n, this.options]);
+				}
+			}
+		}
+
+		this.$element.html(formated);
+		this._trigger('update',n);
+	}
+
+	get() {
+		return this.now;
+	}
+
+	start() {
+		this._clear();
+		this._trigger('start');
+		this.go(this.to);
+	}
+
+	_clear() {
+		if (this._requestId) {
+			window.cancelAnimationFrame(this._requestId);
+			this._requestId = null;
+		}
+	}
+
+	reset() {
+		this._clear();
+		this._update(this.first);
+		this._trigger('reset');
+	}
+
+	stop() {
+		this._clear();
+		this._trigger('stop');
+	}
+
+	finish() {
+		this._clear();
+		this._update(this.to);
+		this._trigger('finish');
+	}
+
+	destory() {
+		this.$element.data(NAME, null);
+		this._trigger('destory');
+	}
+
+	static _jQueryInterface(options, ...params) {
+		"use strict";
+		if (typeof options === 'string') {
+			// let method = options;
+
+			if (/^\_/.test(options)) {
+				return false;
+			} else if ((/^(get)$/.test(options))) {
+				let api = this.first().data(NAME);
+				if (api && typeof api[options] === 'function') {
+					return api[options](params);
+				}
+			} else {
+				return this.each(function () {
+					let api = $.data(this, NAME);
+					if (api && typeof api[options] === 'function') {
+						api[options](params);
+					}
+				});
+			}
+		} else {
+			return this.each(function () {
+				if (!$.data(this, NAME)) {
+					$.data(this, NAME, new dynamicNumber(this, options));
+				}
+			});
+		}
+
+	}
+}
+
+$.fn[NAME] = dynamicNumber._jQueryInterface;
+$.fn[NAME].constructor = dynamicNumber;
+$.fn[NAME].noConflict = function () {
+	$.fn[NAME] = JQUERY_NO_CONFLICT
+	return dynamicNumber._jQueryInterface
+};
+
+export default dynamicNumber;
