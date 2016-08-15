@@ -1,7 +1,81 @@
+/**
+* jQuery dynamicNumber
+* A jQuery plugin that animate the progress bar
+* Compiled: Mon Aug 15 2016 15:26:02 GMT+0800 (CST)
+* @version v0.1.0
+* @link https://github.com/amazingSurge/jquery-dynamicNumber
+* @copyright LGPL-3.0
+*/
 import $ from 'jQuery';
-import defaults from './defaults';
-import formaters from './formaters';
-import getTime from './getTime';
+
+var defaults = {
+  namespace: '',
+  from: 0,
+  to: 100,
+  duration: 1000,
+  decimals: 0,
+  format: function(n, options) {
+    'use strict';
+    return n.toFixed(options.decimals);
+  },
+  percentage: {
+    decimals: 0
+  },
+  currency: {
+    indicator: '$',
+    size: 3,
+    decimals: '2',
+    separator: ',',
+    decimalsPoint: '.'
+  },
+  group: {
+    size: 3,
+    decimals: '2',
+    separator: ',',
+    decimalsPoint: '.'
+  }
+};
+
+let formaters = {
+  percentage(n, options) {
+    'use strict';
+    return `${n.toFixed(options.decimals)}%`;
+  },
+  currency(n, options) {
+    'use strict';
+    return options.indicator + formaters.group(n, options);
+  },
+  group(n, options) {
+    'use strict';
+    let decimals = options.decimals,
+      s = '';
+    if (decimals) {
+      let k = Math.pow(10, decimals);
+      s = String(Math.round(n * k) / k);
+    } else {
+      s = String(Math.round(n));
+    }
+    s = s.split('.');
+
+    if (s[0].length > 3) {
+      let reg = new RegExp(`\\B(?=(?:\\d{${options.size}})+(?!\\d))`, 'g');
+      s[0] = s[0].replace(reg, options.separator);
+    }
+    if ((s[1] || '').length < decimals) {
+      s[1] = s[1] || '';
+      s[1] += new Array(decimals - s[1].length + 1).join('0');
+    }
+    return s.join(options.decimalsPoint);
+  }
+};
+
+let getTime = () => {
+  'use strict';
+  if (window.performance.now) {
+    return window.performance.now();
+  }
+  return Date.now();
+};
 
 if (!Date.now) {
   Date.now = () => {
