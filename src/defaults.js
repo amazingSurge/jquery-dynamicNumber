@@ -1,11 +1,9 @@
 export default {
-  namespace: '',
   from: 0,
   to: 100,
   duration: 1000,
   decimals: 0,
   format: function(n, options) {
-    'use strict';
     return n.toFixed(options.decimals);
   },
   percentage: {

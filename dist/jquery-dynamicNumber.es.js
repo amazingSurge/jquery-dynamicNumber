@@ -1,21 +1,18 @@
 /**
-* jQuery dynamicNumber
-* A jQuery plugin that animate the progress bar
-* Compiled: Mon Aug 15 2016 15:26:02 GMT+0800 (CST)
-* @version v0.1.0
-* @link https://github.com/amazingSurge/jquery-dynamicNumber
-* @copyright LGPL-3.0
+* jQuery dynamicNumber v0.2.0
+* https://github.com/amazingSurge/jquery-dynamicNumber
+*
+* Copyright (c) amazingSurge
+* Released under the LGPL-3.0 license
 */
-import $ from 'jQuery';
+import $ from 'jquery';
 
-var defaults = {
-  namespace: '',
+var DEFAULTS = {
   from: 0,
   to: 100,
   duration: 1000,
   decimals: 0,
   format: function(n, options) {
-    'use strict';
     return n.toFixed(options.decimals);
   },
   percentage: {
@@ -108,16 +105,14 @@ if (/iP(ad|hone|od).*OS 6/.test(window.navigator.userAgent) // iOS6 is buggy
   window.cancelAnimationFrame = clearTimeout;
 }
 
-const NAME = 'dynamicNumber';
-
-defaults.namespace = NAME;
+const NAMESPACE$1 = 'dynamicNumber';
 
 class dynamicNumber {
   constructor(element, options) {
     this.element = element;
     this.$element = $(element);
 
-    this.options = $.extend(true, {}, defaults, options, this.$element.data());
+    this.options = $.extend(true, {}, DEFAULTS, options, this.$element.data());
     this.options.step = parseFloat(this.options.step, 10);
 
     this.first = this.$element.attr('aria-valuenow');
@@ -141,7 +136,7 @@ class dynamicNumber {
   _trigger(eventType, ...params) {
     let data = [this].concat(params);
     //event
-    this.$element.trigger(`${NAME}::${eventType}`, data);
+    this.$element.trigger(`${NAMESPACE$1}::${eventType}`, data);
 
     //callback
     eventType = eventType.replace(/\b\w+\b/g, word => {
@@ -255,46 +250,52 @@ class dynamicNumber {
   }
 
   destory() {
-    this.$element.data(NAME, null);
+    this.$element.data(NAMESPACE$1, null);
     this._trigger('destory');
-  }
-
-  static _jQueryInterface(options, ...params) {
-    'use strict';
-    if (typeof options === 'string') {
-      // let method = options;
-
-      if (/^\_/.test(options)) {
-        return false;
-      } else if ((/^(get)$/.test(options))) {
-        let api = this.first().data(NAME);
-        if (api && typeof api[options] === 'function') {
-          return api[options](params);
-        }
-      } else {
-        return this.each(function() {
-          let api = $.data(this, NAME);
-          if (api && typeof api[options] === 'function') {
-            api[options](params);
-          }
-        });
-      }
-    }
-    return this.each(function() {
-      if (!$.data(this, NAME)) {
-        $.data(this, NAME, new dynamicNumber(this, options));
-      }
-    });
-
   }
 }
 
-$.fn[NAME] = dynamicNumber._jQueryInterface;
-$.fn[NAME].constructor = dynamicNumber;
-$.fn[NAME].noConflict = function() {
-  'use strict';
-  $.fn[NAME] = JQUERY_NO_CONFLICT;
-  return dynamicNumber._jQueryInterface;
+var info = {
+  version:'0.2.0'
 };
 
-export default dynamicNumber;
+const NAMESPACE = 'dynamicNumber';
+const OtherDynamicNumber = $.fn.dynamicNumber;
+
+const jQueryDynamicNumber = function(options, ...args) {
+  if (typeof options === 'string') {
+    const method = options;
+
+    if (/^_/.test(method)) {
+      return false;
+    } else if ((/^(get)/.test(method))) {
+      const instance = this.first().data(NAMESPACE);
+      if (instance && typeof instance[method] === 'function') {
+        return instance[method](...args);
+      }
+    } else {
+      return this.each(function() {
+        const instance = $.data(this, NAMESPACE);
+        if (instance && typeof instance[method] === 'function') {
+          instance[method](...args);
+        }
+      });
+    }
+  }
+
+  return this.each(function() {
+    if (!$(this).data(NAMESPACE)) {
+      $(this).data(NAMESPACE, new dynamicNumber(this, options));
+    }
+  });
+};
+
+$.fn.dynamicNumber = jQueryDynamicNumber;
+
+$.dynamicNumber = $.extend({
+  setDefaults: dynamicNumber.setDefaults,
+  noConflict: function() {
+    $.fn.dynamicNumber = OtherDynamicNumber;
+    return jQueryDynamicNumber;
+  }
+}, info);

@@ -1,5 +1,5 @@
-import $ from 'jQuery';
-import defaults from './defaults';
+import $ from 'jquery';
+import DEFAULTS from './defaults';
 import formaters from './formaters';
 import getTime from './getTime';
 
@@ -34,16 +34,14 @@ if (/iP(ad|hone|od).*OS 6/.test(window.navigator.userAgent) // iOS6 is buggy
   window.cancelAnimationFrame = clearTimeout;
 }
 
-const NAME = 'dynamicNumber';
-
-defaults.namespace = NAME;
+const NAMESPACE = 'dynamicNumber';
 
 class dynamicNumber {
   constructor(element, options) {
     this.element = element;
     this.$element = $(element);
 
-    this.options = $.extend(true, {}, defaults, options, this.$element.data());
+    this.options = $.extend(true, {}, DEFAULTS, options, this.$element.data());
     this.options.step = parseFloat(this.options.step, 10);
 
     this.first = this.$element.attr('aria-valuenow');
@@ -67,7 +65,7 @@ class dynamicNumber {
   _trigger(eventType, ...params) {
     let data = [this].concat(params);
     //event
-    this.$element.trigger(`${NAME}::${eventType}`, data);
+    this.$element.trigger(`${NAMESPACE}::${eventType}`, data);
 
     //callback
     eventType = eventType.replace(/\b\w+\b/g, word => {
@@ -181,46 +179,9 @@ class dynamicNumber {
   }
 
   destory() {
-    this.$element.data(NAME, null);
+    this.$element.data(NAMESPACE, null);
     this._trigger('destory');
   }
-
-  static _jQueryInterface(options, ...params) {
-    'use strict';
-    if (typeof options === 'string') {
-      // let method = options;
-
-      if (/^\_/.test(options)) {
-        return false;
-      } else if ((/^(get)$/.test(options))) {
-        let api = this.first().data(NAME);
-        if (api && typeof api[options] === 'function') {
-          return api[options](params);
-        }
-      } else {
-        return this.each(function() {
-          let api = $.data(this, NAME);
-          if (api && typeof api[options] === 'function') {
-            api[options](params);
-          }
-        });
-      }
-    }
-    return this.each(function() {
-      if (!$.data(this, NAME)) {
-        $.data(this, NAME, new dynamicNumber(this, options));
-      }
-    });
-
-  }
 }
-
-$.fn[NAME] = dynamicNumber._jQueryInterface;
-$.fn[NAME].constructor = dynamicNumber;
-$.fn[NAME].noConflict = function() {
-  'use strict';
-  $.fn[NAME] = JQUERY_NO_CONFLICT;
-  return dynamicNumber._jQueryInterface;
-};
 
 export default dynamicNumber;

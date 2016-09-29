@@ -1,39 +1,45 @@
 /**
-* jQuery dynamicNumber
-* A jQuery plugin that animate the progress bar
-* Compiled: Mon Aug 15 2016 15:26:02 GMT+0800 (CST)
-* @version v0.1.0
-* @link https://github.com/amazingSurge/jquery-dynamicNumber
-* @copyright LGPL-3.0
+* jQuery dynamicNumber v0.2.0
+* https://github.com/amazingSurge/jquery-dynamicNumber
+*
+* Copyright (c) amazingSurge
+* Released under the LGPL-3.0 license
 */
 (function(global, factory) {
   if (typeof define === "function" && define.amd) {
-    define(['exports', 'jQuery'], factory);
+    define(['jquery'], factory);
   } else if (typeof exports !== "undefined") {
-    factory(exports, require('jQuery'));
+    factory(require('jquery'));
   } else {
     var mod = {
       exports: {}
     };
-    factory(mod.exports, global.jQuery);
-    global.jqueryDynamicNumber = mod.exports;
+    factory(global.jQuery);
+    global.jqueryDynamicNumberEs = mod.exports;
   }
 })(this,
 
-  function(exports, _jQuery) {
+  function(_jquery) {
     'use strict';
 
-    Object.defineProperty(exports, "__esModule", {
-      value: true
-    });
-
-    var _jQuery2 = _interopRequireDefault(_jQuery);
+    var _jquery2 = _interopRequireDefault(_jquery);
 
     function _interopRequireDefault(obj) {
       return obj && obj.__esModule ? obj : {
         default: obj
       };
     }
+
+    var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ?
+
+      function(obj) {
+        return typeof obj;
+      }
+      :
+
+      function(obj) {
+        return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+      };
 
     function _classCallCheck(instance, Constructor) {
       if (!(instance instanceof Constructor)) {
@@ -65,15 +71,12 @@
       };
     }();
 
-    var defaults = {
-      namespace: '',
+    var DEFAULTS = {
       from: 0,
       to: 100,
       duration: 1000,
       decimals: 0,
       format: function format(n, options) {
-        'use strict';
-
         return n.toFixed(options.decimals);
       },
       percentage: {
@@ -183,18 +186,16 @@
       })();
     }
 
-    var NAME = 'dynamicNumber';
-
-    defaults.namespace = NAME;
+    var NAMESPACE$1 = 'dynamicNumber';
 
     var dynamicNumber = function() {
       function dynamicNumber(element, options) {
         _classCallCheck(this, dynamicNumber);
 
         this.element = element;
-        this.$element = (0, _jQuery2.default)(element);
+        this.$element = (0, _jquery2.default)(element);
 
-        this.options = _jQuery2.default.extend(true, {}, defaults, options, this.$element.data());
+        this.options = _jquery2.default.extend(true, {}, DEFAULTS, options, this.$element.data());
         this.options.step = parseFloat(this.options.step, 10);
 
         this.first = this.$element.attr('aria-valuenow');
@@ -225,7 +226,7 @@
 
           var data = [this].concat(params);
           //event
-          this.$element.trigger(NAME + '::' + eventType, data);
+          this.$element.trigger(NAMESPACE$1 + '::' + eventType, data);
 
           //callback
           eventType = eventType.replace(/\b\w+\b/g,
@@ -359,71 +360,87 @@
       }, {
         key: 'destory',
         value: function destory() {
-          this.$element.data(NAME, null);
+          this.$element.data(NAMESPACE$1, null);
           this._trigger('destory');
-        }
-      }], [{
-        key: '_jQueryInterface',
-        value: function _jQueryInterface(options) {
-          'use strict';
-
-          for (var _len2 = arguments.length, params = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-            params[_key2 - 1] = arguments[_key2];
-          }
-
-          if (typeof options === 'string') {
-            // let method = options;
-
-            if (/^\_/.test(options)) {
-
-              return false;
-            } else if (/^(get)$/.test(options)) {
-              var api = this.first().data(NAME);
-
-              if (api && typeof api[options] === 'function') {
-
-                return api[options](params);
-              }
-            } else {
-
-              return this.each(
-
-                function() {
-                  var api = _jQuery2.default.data(this, NAME);
-
-                  if (api && typeof api[options] === 'function') {
-                    api[options](params);
-                  }
-                }
-              );
-            }
-          }
-
-          return this.each(
-
-            function() {
-              if (!_jQuery2.default.data(this, NAME)) {
-                _jQuery2.default.data(this, NAME, new dynamicNumber(this, options));
-              }
-            }
-          );
         }
       }]);
 
       return dynamicNumber;
     }();
 
-    _jQuery2.default.fn[NAME] = dynamicNumber._jQueryInterface;
-    _jQuery2.default.fn[NAME].constructor = dynamicNumber;
-    _jQuery2.default.fn[NAME].noConflict = function() {
-      'use strict';
+    var info = {
+      version: '0.2.0'
+    };
 
-      _jQuery2.default.fn[NAME] = JQUERY_NO_CONFLICT;
+    var NAMESPACE = 'dynamicNumber';
+    var OtherDynamicNumber = _jquery2.default.fn.dynamicNumber;
 
-      return dynamicNumber._jQueryInterface;
-    }
-    ;
+    var jQueryDynamicNumber = function jQueryDynamicNumber(options) {
+      var _this2 = this;
 
-    exports.default = dynamicNumber;
+      for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+        args[_key2 - 1] = arguments[_key2];
+      }
+
+      if (typeof options === 'string') {
+        var _ret2 = function() {
+          var method = options;
+
+          if (/^_/.test(method)) {
+
+            return {
+              v: false
+            };
+          } else if (/^(get)/.test(method)) {
+            var instance = _this2.first().data(NAMESPACE);
+
+            if (instance && typeof instance[method] === 'function') {
+
+              return {
+                v: instance[method].apply(instance, args)
+              };
+            }
+          } else {
+
+            return {
+              v: _this2.each(
+
+                function() {
+                  var instance = _jquery2.default.data(this, NAMESPACE);
+
+                  if (instance && typeof instance[method] === 'function') {
+                    instance[method].apply(instance, args);
+                  }
+                }
+              )
+            };
+          }
+        }();
+
+        if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object")
+
+          return _ret2.v;
+      }
+
+      return this.each(
+
+        function() {
+          if (!(0, _jquery2.default)(this).data(NAMESPACE)) {
+            (0, _jquery2.default)(this).data(NAMESPACE, new dynamicNumber(this, options));
+          }
+        }
+      );
+    };
+
+    _jquery2.default.fn.dynamicNumber = jQueryDynamicNumber;
+
+    _jquery2.default.dynamicNumber = _jquery2.default.extend({
+      setDefaults: dynamicNumber.setDefaults,
+      noConflict: function noConflict() {
+        _jquery2.default.fn.dynamicNumber = OtherDynamicNumber;
+
+        return jQueryDynamicNumber;
+      }
+    }, info);
   }
 );
