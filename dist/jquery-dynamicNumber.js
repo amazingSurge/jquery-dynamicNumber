@@ -1,5 +1,5 @@
 /**
-* jQuery dynamicNumber v0.2.0
+* jQuery dynamicNumber v0.2.1
 * https://github.com/amazingSurge/jquery-dynamicNumber
 *
 * Copyright (c) amazingSurge
@@ -189,7 +189,9 @@
     var NAMESPACE$1 = 'dynamicNumber';
 
     var dynamicNumber = function() {
-      function dynamicNumber(element, options) {
+      function dynamicNumber(element) {
+        var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
         _classCallCheck(this, dynamicNumber);
 
         this.element = element;
@@ -363,13 +365,18 @@
           this.$element.data(NAMESPACE$1, null);
           this._trigger('destory');
         }
+      }], [{
+        key: 'setDefaults',
+        value: function setDefaults(options) {
+          _jquery2.default.extend(true, DEFAULTS, _jquery2.default.isPlainObject(options) && options);
+        }
       }]);
 
       return dynamicNumber;
     }();
 
     var info = {
-      version: '0.2.0'
+      version: '0.2.1'
     };
 
     var NAMESPACE = 'dynamicNumber';

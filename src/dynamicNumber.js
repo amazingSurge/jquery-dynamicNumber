@@ -37,7 +37,7 @@ if (/iP(ad|hone|od).*OS 6/.test(window.navigator.userAgent) // iOS6 is buggy
 const NAMESPACE = 'dynamicNumber';
 
 class dynamicNumber {
-  constructor(element, options) {
+  constructor(element, options = {}) {
     this.element = element;
     this.$element = $(element);
 
@@ -181,6 +181,10 @@ class dynamicNumber {
   destory() {
     this.$element.data(NAMESPACE, null);
     this._trigger('destory');
+  }
+
+  static setDefaults(options) {
+    $.extend(true, DEFAULTS, $.isPlainObject(options) && options);
   }
 }
 
