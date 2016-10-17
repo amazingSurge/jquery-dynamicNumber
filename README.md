@@ -43,6 +43,11 @@ bower install jquery-dynamicNumber --save
 npm install jquery-dynamicNumber --save
 ```
 
+#### Install From Yarn
+```sh
+yarn add jquery-dynamicNumber
+```
+
 #### Build From Source
 If you want build from source:
 

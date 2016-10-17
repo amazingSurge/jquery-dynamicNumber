@@ -178,9 +178,9 @@ class dynamicNumber {
     this._trigger('finish');
   }
 
-  destory() {
+  destroy() {
     this.$element.data(NAMESPACE, null);
-    this._trigger('destory');
+    this._trigger('destroy');
   }
 
   static setDefaults(options) {

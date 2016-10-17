@@ -1,5 +1,5 @@
 /**
-* jQuery dynamicNumber v0.2.1
+* jQuery dynamicNumber v0.2.2
 * https://github.com/amazingSurge/jquery-dynamicNumber
 *
 * Copyright (c) amazingSurge
@@ -249,9 +249,9 @@ class dynamicNumber {
     this._trigger('finish');
   }
 
-  destory() {
+  destroy() {
     this.$element.data(NAMESPACE$1, null);
-    this._trigger('destory');
+    this._trigger('destroy');
   }
 
   static setDefaults(options) {
@@ -260,7 +260,7 @@ class dynamicNumber {
 }
 
 var info = {
-  version:'0.2.1'
+  version:'0.2.2'
 };
 
 const NAMESPACE = 'dynamicNumber';
