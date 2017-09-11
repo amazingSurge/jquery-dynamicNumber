@@ -2,7 +2,7 @@
   "name": "jquery-dynamicNumber",
   "title": "jQuery dynamicNumber",
   "description": "A jQuery plugin that animate the number dynamically",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "homepage": "https://github.com/amazingSurge/jquery-dynamicNumber",
   "author": {
     "name": "amazingSurge",
@@ -29,6 +29,7 @@
   ],
   "license": "LGPL-3.0",
   "main": "dist/jquery-dynamicNumber.js",
+  "module": "dist/jquery-dynamicNumber.es.js",
   "files": [
     "dist",
     "src"
@@ -43,7 +44,7 @@
     "test": "gulp test"
   },
   "devDependencies": {
-    "argv": "*",
+    "yargs": "*",
     "assets-manager": "*",
     "babel-core": "*",
     "babel-eslint": "*",
@@ -55,7 +56,8 @@
     "browser-sync": "*",
     "chai": "*",
     "del": "*",
-    "esformatter": "*",
+    "prettier": "*",
+    "gulp-nf-prettier": "*",
     "graceful-fs": "*",
     "gulp": "github:gulpjs/gulp#4.0",
     "gulp-autoprefixer": "*",
@@ -67,7 +69,6 @@
     "gulp-header": "*",
     "gulp-iconfont-css": "*",
     "gulp-if": "*",
-    "gulp-jshint": "*",
     "gulp-notify": "*",
     "gulp-plumber": "*",
     "gulp-rename": "*",
@@ -79,7 +80,7 @@
     "gulp-util": "*",
     "gulp-zip": "*",
     "inquirer": "*",
-    "jshint": "*",
+    "semver": "*",
     "karma": "*",
     "karma-babel-preprocessor": "*",
     "karma-chrome-launcher": "*",
@@ -102,7 +103,7 @@
     "rollup-plugin-istanbul": "*",
     "sinon": "*",
     "sinon-chai": "*",
-    "normalize.css": "^4.2.0",
+    "normalize.css": "^7.0.0",
     "through2": "*"
   },
   "engines": {

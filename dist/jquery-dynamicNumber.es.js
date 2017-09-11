@@ -1,5 +1,5 @@
 /**
-* jQuery dynamicNumber v0.2.2
+* jQuery dynamicNumber v0.2.3
 * https://github.com/amazingSurge/jquery-dynamicNumber
 *
 * Copyright (c) amazingSurge
@@ -260,7 +260,7 @@ class dynamicNumber {
 }
 
 var info = {
-  version:'0.2.2'
+  version:'0.2.3'
 };
 
 const NAMESPACE = 'dynamicNumber';
